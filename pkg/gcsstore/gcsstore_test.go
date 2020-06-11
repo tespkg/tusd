@@ -267,7 +267,7 @@ func TestGetReader(t *testing.T) {
 	upload, err := store.GetUpload(context.Background(), mockID)
 	assert.Nil(err)
 
-	reader, err := upload.GetReader(context.Background())
+	reader, err := upload.GetReader(context.Background(), nil, nil)
 	assert.Nil(err)
 
 	buf := make([]byte, len(mockReaderData))

@@ -750,7 +750,7 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	src, err := upload.GetReader(ctx)
+	src, err := upload.GetReader(ctx, nil, nil)
 	if err != nil {
 		handler.sendError(w, r, err)
 		return

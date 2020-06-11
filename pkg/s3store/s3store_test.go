@@ -498,7 +498,7 @@ func TestGetReader(t *testing.T) {
 	upload, err := store.GetUpload(context.Background(), "uploadId+multipartId")
 	assert.Nil(err)
 
-	content, err := upload.GetReader(context.Background())
+	content, err := upload.GetReader(context.Background(), nil, nil)
 	assert.Nil(err)
 	assert.Equal(ioutil.NopCloser(bytes.NewReader([]byte(`hello world`))), content)
 }
@@ -527,7 +527,7 @@ func TestGetReaderNotFound(t *testing.T) {
 	upload, err := store.GetUpload(context.Background(), "uploadId+multipartId")
 	assert.Nil(err)
 
-	content, err := upload.GetReader(context.Background())
+	content, err := upload.GetReader(context.Background(), nil, nil)
 	assert.Nil(content)
 	assert.Equal(handler.ErrNotFound, err)
 }
@@ -558,7 +558,7 @@ func TestGetReaderNotFinished(t *testing.T) {
 	upload, err := store.GetUpload(context.Background(), "uploadId+multipartId")
 	assert.Nil(err)
 
-	content, err := upload.GetReader(context.Background())
+	content, err := upload.GetReader(context.Background(), nil, nil)
 	assert.Nil(content)
 	assert.Equal("cannot stream non-finished upload", err.Error())
 }

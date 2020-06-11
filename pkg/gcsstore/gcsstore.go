@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -321,7 +322,7 @@ func (upload gcsUpload) Terminate(ctx context.Context) error {
 	return nil
 }
 
-func (upload gcsUpload) GetReader(ctx context.Context) (io.Reader, error) {
+func (upload gcsUpload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
 	id := upload.id
 	store := upload.store
 
