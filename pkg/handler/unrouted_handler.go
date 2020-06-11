@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -364,7 +365,11 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 
 	// Add the Location header directly after creating the new resource to even
 	// include it in cases of failure when an error is returned
-	url := handler.absFileURL(r, id)
+	var filename = "unknow.filename"
+	if v := info.MetaData["filename"]; strings.Trim(v, " ") != "" {
+		filename = filepath.Base(strings.Trim(v, " "))
+	}
+	url := handler.absFileURL(r, id) + "/" + filename
 	w.Header().Set("Location", url)
 
 	handler.Metrics.incUploadsCreated()

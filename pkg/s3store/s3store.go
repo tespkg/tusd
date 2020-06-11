@@ -81,8 +81,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tus/tusd/internal/uid"
-	"github.com/tus/tusd/pkg/handler"
+	"github.com/tespkg/tusd/internal/uid"
+	"github.com/tespkg/tusd/pkg/handler"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"

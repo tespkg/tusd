@@ -1,4 +1,4 @@
-module github.com/tus/tusd
+module github.com/tespkg/tusd
 
 go 1.12
 

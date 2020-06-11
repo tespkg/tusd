@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tus/tusd/pkg/handler"
+	"github.com/tespkg/tusd/pkg/handler"
 )
 
 // Setups the different components, starts a Listener and give it to

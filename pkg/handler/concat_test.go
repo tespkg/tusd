@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/tus/tusd/pkg/handler"
+	. "github.com/tespkg/tusd/pkg/handler"
 )
 
 func TestConcat(t *testing.T) {
