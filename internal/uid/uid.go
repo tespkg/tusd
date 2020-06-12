@@ -12,7 +12,7 @@ import (
 //
 // See: http://en.wikipedia.org/wiki/UUID#Random_UUID_probability_of_duplicates
 func Uid() string {
-	id := make([]byte, 16)
+	id := make([]byte, 20)
 	_, err := io.ReadFull(rand.Reader, id)
 	if err != nil {
 		// This is probably an appropriate way to handle errors from our source
