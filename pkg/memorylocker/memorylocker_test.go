@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/tespkg/tusd/pkg/handler"
+	"github.com/tus/tusd/pkg/handler"
 )
 
 var _ handler.Locker = &MemoryLocker{}

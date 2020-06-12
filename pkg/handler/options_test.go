@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	. "github.com/tespkg/tusd/pkg/handler"
+	. "github.com/tus/tusd/pkg/handler"
 )
 
 func TestOptions(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/tespkg/tusd/pkg/handler"
+	"github.com/tus/tusd/pkg/handler"
 )
 
 var stdout = log.New(os.Stdout, "[tusd] ", log.Ldate|log.Ltime)

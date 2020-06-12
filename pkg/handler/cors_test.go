@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	. "github.com/tespkg/tusd/pkg/handler"
+	. "github.com/tus/tusd/pkg/handler"
 )
 
 func TestCORS(t *testing.T) {

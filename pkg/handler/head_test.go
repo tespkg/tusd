@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/tespkg/tusd/pkg/handler"
+	. "github.com/tus/tusd/pkg/handler"
 )
 
 func TestHead(t *testing.T) {

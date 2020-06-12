@@ -13,7 +13,7 @@ package memorylocker
 import (
 	"sync"
 
-	"github.com/tespkg/tusd/pkg/handler"
+	"github.com/tus/tusd/pkg/handler"
 )
 
 // MemoryLocker persists locks using memory and therefore allowing a simple and

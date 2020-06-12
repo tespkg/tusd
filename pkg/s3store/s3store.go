@@ -83,8 +83,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tespkg/tusd/internal/uid"
-	"github.com/tespkg/tusd/pkg/handler"
+	"github.com/tus/tusd/internal/uid"
+	"github.com/tus/tusd/pkg/handler"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -186,8 +186,6 @@ type s3Upload struct {
 	// the GetInfo and writeInfo functions.
 	info *handler.FileInfo
 }
-
-
 
 func (store S3Store) NewUpload(ctx context.Context, info handler.FileInfo) (handler.Upload, error) {
 	if err := store.validate(info); err != nil {

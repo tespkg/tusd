@@ -6,11 +6,12 @@ package handler_test
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
-	handler "github.com/tespkg/tusd/pkg/handler"
 	io "io"
-    "net/http"
-    reflect "reflect"
+	"net/http"
+	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
+	handler "github.com/tus/tusd/pkg/handler"
 )
 
 // MockFullDataStore is a mock of FullDataStore interface
