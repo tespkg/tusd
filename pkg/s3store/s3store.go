@@ -355,14 +355,17 @@ func (upload s3Upload) WriteChunk(ctx context.Context, offset int64, src io.Read
 		// Seek to the beginning of the file
 		file.Seek(0, 0)
 
+		stat, _ := file.Stat()
+
 		isFinalChunk := !info.SizeIsDeferred && (size == (offset-incompletePartSize)+n)
 		if n >= store.MinPartSize || isFinalChunk {
 			_, err = store.Service.UploadPartWithContext(ctx, &s3.UploadPartInput{
-				Bucket:     aws.String(store.Bucket),
-				Key:        store.keyWithPrefix(uploadId),
-				UploadId:   aws.String(multipartId),
-				PartNumber: aws.Int64(nextPartNum),
-				Body:       file,
+				Bucket:        aws.String(store.Bucket),
+				Key:           store.keyWithPrefix(uploadId),
+				UploadId:      aws.String(multipartId),
+				PartNumber:    aws.Int64(nextPartNum),
+				Body:          file,
+				ContentLength: aws.Int64(stat.Size()),
 			})
 			if err != nil {
 				return bytesUploaded, err
@@ -624,11 +627,12 @@ func (upload s3Upload) FinishUpload(ctx context.Context) error {
 		// upload. So if the tus upload has a size of 0, we create an empty part
 		// and use that for completing the multipart upload.
 		res, err := store.Service.UploadPartWithContext(ctx, &s3.UploadPartInput{
-			Bucket:     aws.String(store.Bucket),
-			Key:        store.keyWithPrefix(uploadId),
-			UploadId:   aws.String(multipartId),
-			PartNumber: aws.Int64(1),
-			Body:       bytes.NewReader([]byte{}),
+			Bucket:        aws.String(store.Bucket),
+			Key:           store.keyWithPrefix(uploadId),
+			UploadId:      aws.String(multipartId),
+			PartNumber:    aws.Int64(1),
+			Body:          bytes.NewReader([]byte{}),
+			ContentLength: aws.Int64(0),
 		})
 		if err != nil {
 			return err
