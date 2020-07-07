@@ -371,7 +371,7 @@ func (upload s3Upload) WriteChunk(ctx context.Context, offset int64, src io.Read
 				return bytesUploaded, err
 			}
 		} else {
-			if err := store.putIncompletePartForUpload(ctx, uploadId, file); err != nil {
+			if err := store.putIncompletePartForUpload(ctx, uploadId, file, stat.Size()); err != nil {
 				return bytesUploaded, err
 			}
 
@@ -820,11 +820,12 @@ func (store S3Store) getIncompletePartForUpload(ctx context.Context, uploadId st
 	return obj, err
 }
 
-func (store S3Store) putIncompletePartForUpload(ctx context.Context, uploadId string, r io.ReadSeeker) error {
+func (store S3Store) putIncompletePartForUpload(ctx context.Context, uploadId string, r io.ReadSeeker, size int64) error {
 	_, err := store.Service.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(store.Bucket),
-		Key:    store.metadataKeyWithPrefix(uploadId + ".part"),
-		Body:   r,
+		Bucket:        aws.String(store.Bucket),
+		Key:           store.metadataKeyWithPrefix(uploadId + ".part"),
+		Body:          r,
+		ContentLength: aws.Int64(size),
 	})
 	return err
 }
