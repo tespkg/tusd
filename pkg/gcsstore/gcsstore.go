@@ -322,7 +322,7 @@ func (upload gcsUpload) Terminate(ctx context.Context) error {
 	return nil
 }
 
-func (upload gcsUpload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
+func (upload gcsUpload) GetReader(ctx context.Context, req *http.Request) (io.Reader, string, int, error) {
 	id := upload.id
 	store := upload.store
 
@@ -333,10 +333,10 @@ func (upload gcsUpload) GetReader(ctx context.Context, rw http.ResponseWriter, r
 
 	r, err := store.Service.ReadObject(ctx, params)
 	if err != nil {
-		return nil, err
+		return nil, "", 0, err
 	}
 
-	return r, nil
+	return r, "", 0, nil
 }
 
 func (store GCSStore) keyWithPrefix(key string) string {

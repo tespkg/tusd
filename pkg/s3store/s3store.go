@@ -457,7 +457,7 @@ func (upload s3Upload) fetchInfo(ctx context.Context) (info handler.FileInfo, er
 	return
 }
 
-func (upload s3Upload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
+func (upload s3Upload) GetReader(ctx context.Context, req *http.Request) (io.Reader, string, int, error) {
 	id := upload.id
 	store := upload.store
 	uploadId := id
@@ -465,7 +465,7 @@ func (upload s3Upload) GetReader(ctx context.Context, rw http.ResponseWriter, re
 	if upload.info == nil {
 		info, err := upload.fetchInfo(ctx)
 		if err != nil {
-			return nil, err
+			return nil, "", 0, err
 		}
 		upload.info = &info
 	}
@@ -480,28 +480,25 @@ func (upload s3Upload) GetReader(ctx context.Context, rw http.ResponseWriter, re
 		input.SetRange(req.Header.Get("Range"))
 	}
 
+	var contentLength int
+	var contentRange string
+
 	res, err := store.Service.GetObjectWithContext(ctx, input)
 	if err == nil {
 		// No error occurred, and we are able to stream the object
-		if req != nil && rw != nil {
-			if req.Header.Get("Range") != "" && res.ContentRange != nil {
-				rw.WriteHeader(http.StatusPartialContent)
-				rw.Header().Set("Content-Range", *res.ContentRange)
-			}
-
-			if res.AcceptRanges != nil {
-				rw.Header().Set("Accept-Ranges", *res.AcceptRanges)
-			}
+		if req != nil && req.Header.Get("Range") != "" && res.ContentRange != nil && res.ContentLength != nil {
+			contentRange = *res.ContentRange
+			contentLength = int(*res.ContentLength)
 		}
 
-		return res.Body, nil
+		return res.Body, contentRange, contentLength, nil
 	}
 
 	// If the file cannot be found, we ignore this error and continue since the
 	// upload may not have been finished yet. In this case we do not want to
 	// return a ErrNotFound but a more meaning-full message.
 	if !isAwsError(err, "NoSuchKey") {
-		return nil, err
+		return nil, "", 0, err
 	}
 
 	// Test whether the multipart upload exists to find out if the upload
@@ -514,15 +511,15 @@ func (upload s3Upload) GetReader(ctx context.Context, rw http.ResponseWriter, re
 	})
 	if err == nil {
 		// The multipart upload still exists, which means we cannot download it yet
-		return nil, errors.New("cannot stream non-finished upload")
+		return nil, "", 0, errors.New("cannot stream non-finished upload")
 	}
 
 	if isAwsError(err, "NoSuchUpload") {
 		// Neither the object nor the multipart upload exists, so we return a 404
-		return nil, handler.ErrNotFound
+		return nil, "", 0, handler.ErrNotFound
 	}
 
-	return nil, err
+	return nil, "", 0, err
 }
 
 func (upload s3Upload) Terminate(ctx context.Context) error {

@@ -169,8 +169,9 @@ func (upload *fileUpload) WriteChunk(ctx context.Context, offset int64, src io.R
 	return n, err
 }
 
-func (upload *fileUpload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
-	return os.Open(upload.binPath)
+func (upload *fileUpload) GetReader(ctx context.Context, req *http.Request) (io.Reader, string, int, error) {
+	src, err := os.Open(upload.binPath)
+	return src, "", 0, err
 }
 
 func (upload *fileUpload) Terminate(ctx context.Context) error {
