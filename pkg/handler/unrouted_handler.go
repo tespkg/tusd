@@ -744,33 +744,26 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	contentType, _ := filterContentType(info)
+	// Set headers before sending responses
+	w.Header().Set("Content-Length", strconv.FormatInt(info.Offset, 10))
+
+	contentType, contentDisposition := filterContentType(info)
 	w.Header().Set("Content-Type", contentType)
-	//w.Header().Set("Content-Disposition", contentDisposition)
+	w.Header().Set("Content-Disposition", contentDisposition)
 
 	// If no data has been uploaded yet, respond with an empty "204 No Content" status.
 	if info.Offset == 0 {
-		w.Header().Set("Content-Length", "0")
 		handler.sendResp(w, r, http.StatusNoContent)
 		return
 	}
 
-	src, contentRange, contentLength, err := upload.GetReader(ctx, r)
+	src, err := upload.GetReader(ctx)
 	if err != nil {
 		handler.sendError(w, r, err)
 		return
 	}
 
-	if contentRange != "" && contentLength > 0 {
-		w.Header().Set("Content-Length", strconv.FormatInt(int64(contentLength), 10))
-		w.Header().Set("Content-Range", contentRange)
-		w.Header().Set("Accept-Ranges", "bytes")
-		handler.sendResp(w, r, http.StatusPartialContent)
-	} else {
-		w.Header().Set("Content-Length", strconv.FormatInt(info.Offset, 10))
-		handler.sendResp(w, r, http.StatusOK)
-	}
-
+	handler.sendResp(w, r, http.StatusOK)
 	io.Copy(w, src)
 
 	// Try to close the reader if the io.Closer interface is implemented

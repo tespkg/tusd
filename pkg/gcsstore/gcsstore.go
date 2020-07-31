@@ -16,7 +16,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -322,7 +321,7 @@ func (upload gcsUpload) Terminate(ctx context.Context) error {
 	return nil
 }
 
-func (upload gcsUpload) GetReader(ctx context.Context, req *http.Request) (io.Reader, string, int, error) {
+func (upload gcsUpload) GetReader(ctx context.Context) (io.Reader, error) {
 	id := upload.id
 	store := upload.store
 
@@ -333,10 +332,10 @@ func (upload gcsUpload) GetReader(ctx context.Context, req *http.Request) (io.Re
 
 	r, err := store.Service.ReadObject(ctx, params)
 	if err != nil {
-		return nil, "", 0, err
+		return nil, err
 	}
 
-	return r, "", 0, nil
+	return r, nil
 }
 
 func (store GCSStore) keyWithPrefix(key string) string {

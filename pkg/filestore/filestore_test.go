@@ -60,7 +60,7 @@ func TestFilestore(t *testing.T) {
 	a.EqualValues(11, info.Offset)
 
 	// Read content
-	reader, err := upload.GetReader(ctx, nil, nil)
+	reader, err := upload.GetReader(ctx)
 	a.NoError(err)
 
 	content, err := ioutil.ReadAll(reader)
@@ -138,7 +138,7 @@ func TestConcatUploads(t *testing.T) {
 	a.EqualValues(9, info.Offset)
 
 	// Read content
-	reader, err := finUpload.GetReader(ctx, nil, nil)
+	reader, err := finUpload.GetReader(ctx)
 	a.NoError(err)
 
 	content, err := ioutil.ReadAll(reader)
