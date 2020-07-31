@@ -169,7 +169,8 @@ func (upload *fileUpload) WriteChunk(ctx context.Context, offset int64, src io.R
 }
 
 func (upload *fileUpload) GetReader(ctx context.Context) (io.Reader, error) {
-	return os.Open(upload.binPath)
+	src, err := os.Open(upload.binPath)
+	return src, err
 }
 
 func (upload *fileUpload) Terminate(ctx context.Context) error {

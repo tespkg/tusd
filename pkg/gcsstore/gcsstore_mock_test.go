@@ -5,9 +5,10 @@ package gcsstore_test
 
 import (
 	context "context"
+	io "io"
+
 	gomock "github.com/golang/mock/gomock"
 	gcsstore "github.com/tus/tusd/pkg/gcsstore"
-	io "io"
 )
 
 // Mock of GCSReader interface

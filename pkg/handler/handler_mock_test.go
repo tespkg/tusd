@@ -6,10 +6,12 @@ package handler_test
 
 import (
 	context "context"
+	io "io"
+	"net/http"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	handler "github.com/tus/tusd/pkg/handler"
-	io "io"
-	reflect "reflect"
 )
 
 // MockFullDataStore is a mock of FullDataStore interface
@@ -161,7 +163,7 @@ func (mr *MockFullUploadMockRecorder) GetInfo(ctx interface{}) *gomock.Call {
 }
 
 // GetReader mocks base method
-func (m *MockFullUpload) GetReader(ctx context.Context) (io.Reader, error) {
+func (m *MockFullUpload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReader", ctx)
 	ret0, _ := ret[0].(io.Reader)
