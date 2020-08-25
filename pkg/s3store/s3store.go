@@ -76,6 +76,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -898,12 +899,12 @@ func (store S3Store) metadataKeyWithPrefix(key string) *string {
 func (store S3Store) validate(info handler.FileInfo) error {
 	// an upload larger than MaxObjectSize must throw an error
 	if info.Size > store.MaxObjectSize {
-		return fmt.Errorf("s3store: upload size of %v bytes exceeds MaxObjectSize of %v bytes", info.Size, store.MaxObjectSize)
+		return handler.NewHTTPError(fmt.Errorf("s3store: upload size of %v bytes exceeds MaxObjectSize of %v bytes", info.Size, store.MaxObjectSize), http.StatusForbidden)
 	}
 
 	filename, ok := info.MetaData["filename"]
 	if !ok || strings.Trim(filepath.Base(filename), " ") == "" {
-		return fmt.Errorf("s3store: nonempty filename in upload metadata is required")
+		return handler.NewHTTPError(fmt.Errorf("s3store: nonempty filename in upload metadata is required"), http.StatusBadRequest)
 	}
 
 	return nil
