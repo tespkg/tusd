@@ -10,6 +10,7 @@ import (
 	"math"
 	"net"
 	"net/http"
+	url2 "net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -373,7 +374,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 	if v := info.MetaData["filename"]; strings.Trim(v, " ") != "" {
 		filename = filepath.Base(strings.Trim(v, " "))
 	}
-	url := handler.absFileURL(r, id) + "/" + filename
+	url := handler.absFileURL(r, id) + "/" + url2.PathEscape(filename)
 	w.Header().Set("Location", url)
 
 	handler.Metrics.incUploadsCreated()
