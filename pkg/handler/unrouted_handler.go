@@ -345,6 +345,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 		IsPartial:      isPartial,
 		IsFinal:        isFinal,
 		PartialUploads: partialUploadIDs,
+		ID: 			meta["id"],
 	}
 
 	if handler.config.PreUploadCreateCallback != nil {
