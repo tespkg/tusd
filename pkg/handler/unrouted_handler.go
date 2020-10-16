@@ -700,6 +700,7 @@ func (handler *UnroutedHandler) finishUploadIfComplete(ctx context.Context, uplo
 
 		rw.Header().Set("Tus-Finished", "true")
 		rw.Header().Set("Tus-Filesize", fmt.Sprintf("%d", info.Size))
+		rw.Header().Set("Tus-Metadata", SerializeMetadataHeader(info.MetaData))
 
 		// ... send the info out to the channel
 		if handler.config.NotifyCompleteUploads {
