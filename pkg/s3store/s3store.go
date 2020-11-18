@@ -71,6 +71,7 @@ package s3store
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -141,8 +142,10 @@ type S3Store struct {
 	// MaxObjectSize is the maximum size an S3 Object can have according to S3
 	// API specifications. See link above.
 	MaxObjectSize int64
-	// WithPrefixInID prepend the prefix to the random-generated id if non-empty
+	// WithPrefixInID prepends the prefix to the random-generated id if non-empty
 	WithPrefixInID string
+	// Base64Encoding indicates the random-generated id to be base64 encoding
+	Base64Encoding bool
 }
 
 type S3API interface {
@@ -199,6 +202,9 @@ func (store S3Store) NewUpload(ctx context.Context, info handler.FileInfo) (hand
 		uploadId = uid.Uid()
 		if store.WithPrefixInID != "" {
 			uploadId = store.WithPrefixInID + ":" + uploadId
+		}
+		if store.Base64Encoding {
+			uploadId = base64.URLEncoding.EncodeToString([]byte(uploadId))
 		}
 	} else {
 		// certain tests set info.ID in advance
