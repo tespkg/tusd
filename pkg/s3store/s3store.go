@@ -141,6 +141,8 @@ type S3Store struct {
 	// MaxObjectSize is the maximum size an S3 Object can have according to S3
 	// API specifications. See link above.
 	MaxObjectSize int64
+	// WithPrefixInID prepend the prefix to the random-generated id if non-empty
+	WithPrefixInID string
 }
 
 type S3API interface {
@@ -195,6 +197,9 @@ func (store S3Store) NewUpload(ctx context.Context, info handler.FileInfo) (hand
 	var uploadId string
 	if info.ID == "" {
 		uploadId = uid.Uid()
+		if store.WithPrefixInID != "" {
+			uploadId = store.WithPrefixInID + ":" + uploadId
+		}
 	} else {
 		// certain tests set info.ID in advance
 		uploadId = info.ID
