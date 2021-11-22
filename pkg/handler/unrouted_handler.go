@@ -345,7 +345,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 		IsPartial:      isPartial,
 		IsFinal:        isFinal,
 		PartialUploads: partialUploadIDs,
-		ID: 			meta["id"],
+		ID:             meta["id"],
 	}
 
 	if handler.config.PreUploadCreateCallback != nil {
@@ -378,7 +378,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 		if v := info.MetaData["filename"]; strings.Trim(v, " ") != "" {
 			filename = filepath.Base(strings.Trim(v, " "))
 		}
-		url +=  "/" + url2.PathEscape(filename)
+		url += "/" + url2.PathEscape(filename)
 	}
 
 	w.Header().Set("Location", url)
@@ -655,7 +655,7 @@ func (handler *UnroutedHandler) writeChunk(ctx context.Context, upload Upload, i
 		}
 
 		var err error
-		bytesWritten, err = upload.WriteChunk(ctx, offset, reader)
+		bytesWritten, err = upload.WriteChunk(ctx, offset, maxSize, reader)
 		if terminateUpload && handler.composer.UsesTerminater {
 			if terminateErr := handler.terminateUpload(ctx, upload, info, r); terminateErr != nil {
 				// We only log this error and not show it to the user since this

@@ -146,7 +146,7 @@ func (upload *fileUpload) GetInfo(ctx context.Context) (handler.FileInfo, error)
 	return upload.info, nil
 }
 
-func (upload *fileUpload) WriteChunk(ctx context.Context, offset int64, src io.Reader) (int64, error) {
+func (upload *fileUpload) WriteChunk(ctx context.Context, offset, limit int64, src io.Reader) (int64, error) {
 	file, err := os.OpenFile(upload.binPath, os.O_WRONLY|os.O_APPEND, defaultFilePerm)
 	if err != nil {
 		return 0, err

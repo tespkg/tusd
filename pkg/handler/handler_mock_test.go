@@ -7,7 +7,6 @@ package handler_test
 import (
 	context "context"
 	io "io"
-	"net/http"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -133,7 +132,7 @@ func (m *MockFullUpload) EXPECT() *MockFullUploadMockRecorder {
 }
 
 // WriteChunk mocks base method
-func (m *MockFullUpload) WriteChunk(ctx context.Context, offset int64, src io.Reader) (int64, error) {
+func (m *MockFullUpload) WriteChunk(ctx context.Context, offset, limit int64, src io.Reader) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteChunk", ctx, offset, src)
 	ret0, _ := ret[0].(int64)
@@ -163,7 +162,7 @@ func (mr *MockFullUploadMockRecorder) GetInfo(ctx interface{}) *gomock.Call {
 }
 
 // GetReader mocks base method
-func (m *MockFullUpload) GetReader(ctx context.Context, rw http.ResponseWriter, req *http.Request) (io.Reader, error) {
+func (m *MockFullUpload) GetReader(ctx context.Context) (io.Reader, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReader", ctx)
 	ret0, _ := ret[0].(io.Reader)
