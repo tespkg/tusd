@@ -84,13 +84,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tus/tusd/internal/uid"
-	"github.com/tus/tusd/pkg/handler"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/tus/tusd/internal/uid"
+	"github.com/tus/tusd/pkg/handler"
 )
 
 const (
@@ -416,7 +415,7 @@ func (upload s3Upload) WriteChunk(ctx context.Context, offset, limit int64, src 
 			return (bytesUploaded - incompletePartSize), nil
 		}
 		// Create a temporary file to store the part in it
-		file, err := ioutil.TempFile("", "tusd-s3-tmp-")
+		file, err := ioutil.TempFile(store.TemporaryDirectory, "tusd-s3-tmp-")
 		if err != nil {
 			return bytesUploaded, err
 		}
