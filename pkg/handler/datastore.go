@@ -55,7 +55,7 @@ type Upload interface {
 	// It will also lock resources while they are written to ensure only one
 	// write happens per time.
 	// The function call must return the number of bytes written.
-	WriteChunk(ctx context.Context, offset int64, src io.Reader) (int64, error)
+	WriteChunk(ctx context.Context, offset, limit int64, src io.Reader) (int64, error)
 	// Read the fileinformation used to validate the offset and respond to HEAD
 	// requests. It may return an os.ErrNotExist which will be interpreted as a
 	// 404 Not Found.

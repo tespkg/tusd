@@ -49,7 +49,7 @@ func TestFilestore(t *testing.T) {
 	a.Equal(filepath.Join(tmp, info.ID), info.Storage["Path"])
 
 	// Write data to upload
-	bytesWritten, err := upload.WriteChunk(ctx, 0, strings.NewReader("hello world"))
+	bytesWritten, err := upload.WriteChunk(ctx, 0, 42, strings.NewReader("hello world"))
 	a.NoError(err)
 	a.EqualValues(len("hello world"), bytesWritten)
 
@@ -118,7 +118,7 @@ func TestConcatUploads(t *testing.T) {
 		upload, err := store.NewUpload(ctx, handler.FileInfo{Size: 3})
 		a.NoError(err)
 
-		n, err := upload.WriteChunk(ctx, 0, strings.NewReader(contents[i]))
+		n, err := upload.WriteChunk(ctx, 0, 42, strings.NewReader(contents[i]))
 		a.NoError(err)
 		a.EqualValues(3, n)
 
