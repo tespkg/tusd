@@ -166,6 +166,8 @@ type S3Store struct {
 	// CPU, so it might be desirable to disable them.
 	// Note that this property is experimental and might be removed in the future!
 	DisableContentHashes bool
+
+	IoCopy func(ctx context.Context, dst io.Writer, src io.Reader) (int64, error)
 }
 
 type S3API interface {
@@ -193,6 +195,7 @@ func New(bucket string, service S3API) S3Store {
 		MaxObjectSize:      5 * 1024 * 1024 * 1024 * 1024,
 		MaxBufferedParts:   20,
 		TemporaryDirectory: "",
+		IoCopy:             defaultIoCopy,
 	}
 }
 
@@ -422,7 +425,7 @@ func (upload s3Upload) WriteChunk(ctx context.Context, offset, limit int64, src 
 		defer cleanUpTempFile(file)
 
 		limitedReader := io.LimitReader(src, optimalPartSize)
-		n, err := io.Copy(file, limitedReader)
+		n, err := store.IoCopy(ctx, file, limitedReader)
 
 		// If the HTTP PATCH request gets interrupted in the middle (e.g. because
 		// the user wants to pause the upload), Go's net/http returns an io.ErrUnexpectedEOF.
@@ -1015,4 +1018,8 @@ func (upload *s3Upload) putPartForUpload(ctx context.Context, uploadPartInput *s
 	uploadPartInput.ContentLength = aws.Int64(size)
 	_, err := upload.store.Service.UploadPartWithContext(ctx, uploadPartInput)
 	return err
+}
+
+func defaultIoCopy(ctx context.Context, dst io.Writer, src io.Reader) (int64, error) {
+	return io.Copy(dst, src)
 }

@@ -52,6 +52,9 @@ type Config struct {
 
 	// ExtractIDFromPath extract the ID from the url
 	ExtractIDFromPath func(url string) (string, error)
+
+	// using custom io api
+	CustomIoAPI bool
 }
 
 func (config *Config) validate() error {

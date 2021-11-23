@@ -111,6 +111,12 @@ func newHookEvent(info FileInfo, r *http.Request) HookEvent {
 	}
 }
 
+// UnroutedHandlerIOAPI is io api for unrouted handler.
+type UnroutedHandlerIOAPI interface {
+	WriteChunk(ctx context.Context, upload Upload, info FileInfo, w http.ResponseWriter, r *http.Request) error
+	FinishUploadIfComplete(ctx context.Context, upload Upload, info FileInfo, r *http.Request, rw http.ResponseWriter) error
+}
+
 // UnroutedHandler exposes methods to handle requests as part of the tus protocol,
 // such as PostFile, HeadFile, PatchFile and DelFile. In addition the GetFile method
 // is provided which is, however, not part of the specification.
@@ -152,6 +158,8 @@ type UnroutedHandler struct {
 	CreatedUploads chan HookEvent
 	// Metrics provides numbers of the usage for this handler.
 	Metrics Metrics
+
+	IoAPI UnroutedHandlerIOAPI
 }
 
 // NewUnroutedHandler creates a new handler without routing using the given
@@ -190,6 +198,9 @@ func NewUnroutedHandler(config Config) (*UnroutedHandler, error) {
 		logger:            config.Logger,
 		extensions:        extensions,
 		Metrics:           newMetrics(),
+	}
+	if !config.CustomIoAPI {
+		handler.IoAPI = &UnroutedHandlerSimpleIOAPI{Handler: handler}
 	}
 
 	return handler, nil
@@ -414,7 +425,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 			defer lock.Unlock()
 		}
 
-		if err := handler.writeChunk(ctx, upload, info, w, r); err != nil {
+		if err := handler.IoAPI.WriteChunk(ctx, upload, info, w, r); err != nil {
 			handler.sendError(w, r, err)
 			return
 		}
@@ -422,7 +433,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 		// Directly finish the upload if the upload is empty (i.e. has a size of 0).
 		// This statement is in an else-if block to avoid causing duplicate calls
 		// to finishUploadIfComplete if an upload is empty and contains a chunk.
-		if err := handler.finishUploadIfComplete(ctx, upload, info, r, w); err != nil {
+		if err := handler.IoAPI.FinishUploadIfComplete(ctx, upload, info, r, w); err != nil {
 			handler.sendError(w, r, err)
 			return
 		}
@@ -583,7 +594,7 @@ func (handler *UnroutedHandler) PatchFile(w http.ResponseWriter, r *http.Request
 		info.SizeIsDeferred = false
 	}
 
-	if err := handler.writeChunk(ctx, upload, info, w, r); err != nil {
+	if err := handler.IoAPI.WriteChunk(ctx, upload, info, w, r); err != nil {
 		handler.sendError(w, r, err)
 		return
 	}
@@ -684,7 +695,7 @@ func (handler *UnroutedHandler) writeChunk(ctx context.Context, upload Upload, i
 	handler.Metrics.incBytesReceived(uint64(bytesWritten))
 	info.Offset = newOffset
 
-	return handler.finishUploadIfComplete(ctx, upload, info, r, w)
+	return handler.IoAPI.FinishUploadIfComplete(ctx, upload, info, r, w)
 }
 
 // finishUploadIfComplete checks whether an upload is completed (i.e. upload offset
@@ -1260,4 +1271,22 @@ func getRequestId(r *http.Request) string {
 	}
 
 	return reqId
+}
+
+type UnroutedHandlerSimpleIOAPI struct {
+	Handler *UnroutedHandler
+}
+
+// writeChunk reads the body from the requests r and appends it to the upload
+// with the corresponding id. Afterwards, it will set the necessary response
+// headers but will not send the response.
+func (api *UnroutedHandlerSimpleIOAPI) WriteChunk(ctx context.Context, upload Upload, info FileInfo, w http.ResponseWriter, r *http.Request) error {
+	return api.Handler.writeChunk(ctx, upload, info, w, r)
+}
+
+// finishUploadIfComplete checks whether an upload is completed (i.e. upload offset
+// matches upload size) and if so, it will call the data store's FinishUpload
+// function and send the necessary message on the CompleteUpload channel.
+func (api *UnroutedHandlerSimpleIOAPI) FinishUploadIfComplete(ctx context.Context, upload Upload, info FileInfo, r *http.Request, rw http.ResponseWriter) error {
+	return api.Handler.finishUploadIfComplete(ctx, upload, info, r, rw)
 }
