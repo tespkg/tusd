@@ -88,7 +88,7 @@ func (store GCSStore) AsTerminatableUpload(upload handler.Upload) handler.Termin
 	return upload.(*gcsUpload)
 }
 
-func (upload gcsUpload) WriteChunk(ctx context.Context, offset int64, src io.Reader) (int64, error) {
+func (upload gcsUpload) WriteChunk(ctx context.Context, offset, limit int64, src io.Reader) (int64, error) {
 	id := upload.id
 	store := upload.store
 

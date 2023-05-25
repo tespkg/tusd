@@ -432,6 +432,6 @@ func TestWriteChunk(t *testing.T) {
 	reader := bytes.NewReader([]byte(mockReaderData))
 	var offset int64 = mockSize / 3
 
-	_, err = upload.WriteChunk(context.Background(), offset, reader)
+	_, err = upload.WriteChunk(context.Background(), offset, 10, reader)
 	assert.Nil(err)
 }
